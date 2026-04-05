@@ -1,0 +1,240 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Morning theme (5-11 AM) - warm yellow/peach */
+  :root, .theme-morning {
+    --background: 40 50% 97%;
+    --foreground: 25 30% 15%;
+    --card: 40 40% 98%;
+    --card-foreground: 25 30% 15%;
+    --popover: 40 40% 98%;
+    --popover-foreground: 25 30% 15%;
+    --primary: 25 85% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 45% 92%;
+    --secondary-foreground: 25 30% 20%;
+    --muted: 40 30% 94%;
+    --muted-foreground: 25 15% 45%;
+    --accent: 35 80% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 40 25% 88%;
+    --input: 40 25% 88%;
+    --ring: 25 85% 55%;
+    --radius: 1rem;
+    --gradient-start: 40 80% 85%;
+    --gradient-end: 25 70% 80%;
+    --glass: 40 40% 98% / 0.7;
+    --glow: 25 85% 55% / 0.2;
+    --health-good: 142 70% 45%;
+    --health-warn: 38 92% 50%;
+    --health-bad: 0 72% 51%;
+    --sidebar-background: 40 35% 96%;
+    --sidebar-foreground: 25 30% 20%;
+    --sidebar-primary: 25 85% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 40 40% 92%;
+    --sidebar-accent-foreground: 25 30% 15%;
+    --sidebar-border: 40 25% 88%;
+    --sidebar-ring: 25 85% 55%;
+  }
+
+  /* Afternoon theme (12-4 PM) - calm blues */
+  .theme-afternoon {
+    --background: 210 40% 97%;
+    --foreground: 215 30% 15%;
+    --card: 210 35% 98%;
+    --card-foreground: 215 30% 15%;
+    --popover: 210 35% 98%;
+    --popover-foreground: 215 30% 15%;
+    --primary: 210 75% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 92%;
+    --secondary-foreground: 215 30% 20%;
+    --muted: 210 25% 94%;
+    --muted-foreground: 215 15% 45%;
+    --accent: 195 70% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 210 25% 88%;
+    --input: 210 25% 88%;
+    --ring: 210 75% 50%;
+    --gradient-start: 210 60% 88%;
+    --gradient-end: 195 55% 82%;
+    --glass: 210 35% 98% / 0.7;
+    --glow: 210 75% 50% / 0.2;
+    --sidebar-background: 210 30% 96%;
+    --sidebar-foreground: 215 30% 20%;
+    --sidebar-primary: 210 75% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 35% 92%;
+    --sidebar-accent-foreground: 215 30% 15%;
+    --sidebar-border: 210 25% 88%;
+    --sidebar-ring: 210 75% 50%;
+  }
+
+  /* Evening theme (5-7 PM) - sunset orange/pink */
+  .theme-evening {
+    --background: 15 50% 96%;
+    --foreground: 15 30% 15%;
+    --card: 15 40% 97%;
+    --card-foreground: 15 30% 15%;
+    --popover: 15 40% 97%;
+    --popover-foreground: 15 30% 15%;
+    --primary: 350 70% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 15 40% 92%;
+    --secondary-foreground: 15 30% 20%;
+    --muted: 15 25% 93%;
+    --muted-foreground: 15 15% 45%;
+    --accent: 20 85% 55%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 15 25% 87%;
+    --input: 15 25% 87%;
+    --ring: 350 70% 55%;
+    --gradient-start: 20 70% 85%;
+    --gradient-end: 350 60% 82%;
+    --glass: 15 40% 97% / 0.7;
+    --glow: 350 70% 55% / 0.2;
+    --sidebar-background: 15 35% 95%;
+    --sidebar-foreground: 15 30% 20%;
+    --sidebar-primary: 350 70% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 15 35% 92%;
+    --sidebar-accent-foreground: 15 30% 15%;
+    --sidebar-border: 15 25% 87%;
+    --sidebar-ring: 350 70% 55%;
+  }
+
+  /* Night theme (8 PM - 4 AM) - deep blue/dark */
+  .theme-night {
+    --background: 225 35% 10%;
+    --foreground: 220 20% 90%;
+    --card: 225 30% 14%;
+    --card-foreground: 220 20% 90%;
+    --popover: 225 30% 14%;
+    --popover-foreground: 220 20% 90%;
+    --primary: 230 65% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 225 25% 20%;
+    --secondary-foreground: 220 20% 85%;
+    --muted: 225 20% 18%;
+    --muted-foreground: 220 15% 55%;
+    --accent: 260 55% 55%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62% 40%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 225 20% 22%;
+    --input: 225 20% 22%;
+    --ring: 230 65% 60%;
+    --gradient-start: 230 40% 18%;
+    --gradient-end: 260 35% 15%;
+    --glass: 225 30% 14% / 0.8;
+    --glow: 230 65% 60% / 0.25;
+    --sidebar-background: 225 35% 8%;
+    --sidebar-foreground: 220 20% 85%;
+    --sidebar-primary: 230 65% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 225 25% 16%;
+    --sidebar-accent-foreground: 220 20% 90%;
+    --sidebar-border: 225 20% 18%;
+    --sidebar-ring: 230 65% 60%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', sans-serif;
+    transition: background-color 1.5s ease, color 1.5s ease;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply rounded-[20px] border border-border/50;
+    background: hsl(var(--glass));
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 4px 24px hsl(var(--border) / 0.2), 0 1px 3px hsl(var(--border) / 0.1);
+  }
+
+  .glow-card {
+    @apply glass-card;
+    box-shadow: 0 0 30px hsl(var(--glow)), 0 4px 20px hsl(var(--border) / 0.3);
+  }
+
+  .hover-card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .hover-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px hsl(var(--border) / 0.3), 0 2px 8px hsl(var(--glow));
+  }
+
+  .health-gradient-bg {
+    background: linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-end)));
+  }
+
+  .floating-element {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .floating-element-slow {
+    animation: float 8s ease-in-out infinite;
+  }
+
+  .fade-up {
+    animation: fadeUp 0.6s ease-out forwards;
+  }
+
+  .score-good { color: hsl(var(--health-good)); }
+  .score-warn { color: hsl(var(--health-warn)); }
+  .score-bad { color: hsl(var(--health-bad)); }
+  .bg-good { background-color: hsl(var(--health-good)); }
+  .bg-warn { background-color: hsl(var(--health-warn)); }
+  .bg-bad { background-color: hsl(var(--health-bad)); }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-12px) rotate(2deg); }
+  66% { transform: translateY(6px) rotate(-1deg); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 15px hsl(var(--glow)); }
+  50% { box-shadow: 0 0 30px hsl(var(--glow)), 0 0 50px hsl(var(--glow)); }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
