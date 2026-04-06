@@ -2,38 +2,48 @@ import { useState } from "react";
 import { Cookie, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { analyzeCraving, type CravingAnalysisResult } from "@/lib/cravingAnalysis";
+import type { QuickStats } from "@/hooks/useHealthStore";
 
-const cravingResponses: Record<string, string> = {
-  chocolate: "Try dark chocolate (70%+) with almonds — satisfies the craving with antioxidants!",
-  chips: "Try air-popped popcorn with a pinch of salt, or baked veggie chips.",
-  soda: "Try sparkling water with lemon or mint. Refreshing and zero sugar!",
-  "ice cream": "Try frozen yogurt with berries, or a frozen banana blend.",
-  pizza: "Try a whole-wheat tortilla with tomato, mozzarella, and veggies — baked crispy!",
-  candy: "Try fresh fruit like grapes or mango slices — natural sweetness!",
-  burger: "Try a grilled chicken or turkey patty with fresh veggies.",
-  fries: "Try baked sweet potato fries with a dash of paprika.",
-  cake: "Try a banana oat muffin — naturally sweet and filling.",
-  coffee: "Try green tea or matcha — gentler caffeine with antioxidants.",
-  sweet: "Try dates with peanut butter — naturally sweet and protein-rich.",
-  spicy: "Try roasted chickpeas with chili powder — crunchy and spicy!",
-  crunchy: "Try carrot sticks with hummus, or mixed nuts and seeds.",
-};
-
-function getResponse(input: string): string {
-  const lower = input.toLowerCase();
-  for (const [key, response] of Object.entries(cravingResponses)) {
-    if (lower.includes(key)) return response;
-  }
-  return "Try a handful of mixed nuts or fresh fruit — healthy, satisfying alternatives!";
+interface Props {
+  stats: QuickStats;
 }
 
-export default function CravingPanel() {
+const quickCravings = ["sweet", "salty", "spicy", "junk food"];
+
+function formatCravingTitle(craving: string) {
+  const key = craving.trim().toLowerCase();
+  if (!key) return "Craving";
+  if (key.includes("junk")) return "Junk Food Craving 🍔";
+  if (key.includes("sweet")) return "Sweet Craving 🍫";
+  if (key.includes("salty")) return "Salty Craving 🥨";
+  if (key.includes("spicy")) return "Spicy Craving 🌶️";
+  return `${key.charAt(0).toUpperCase()}${key.slice(1)} Craving`;
+}
+
+function toMoodBucket(mood: string): "low" | "normal" | "good" {
+  if (mood === "😫" || mood === "😴") return "low";
+  if (mood === "😊" || mood === "🙂") return "good";
+  return "normal";
+}
+
+export default function CravingPanel({ stats }: Props) {
   const [input, setInput] = useState("");
-  const [response, setResponse] = useState<string | null>(null);
+  const [response, setResponse] = useState<CravingAnalysisResult | null>(null);
 
   const handleSubmit = () => {
     if (!input.trim()) return;
-    setResponse(getResponse(input));
+    setResponse(
+      analyzeCraving(
+        {
+          sleepHours: stats.sleep,
+          steps: stats.steps,
+          waterIntake: stats.water,
+          mood: toMoodBucket(stats.mood),
+        },
+        input,
+      ),
+    );
   };
 
   return (
@@ -42,7 +52,19 @@ export default function CravingPanel() {
         <Cookie size={18} className="text-accent" />
         <h4 className="font-heading font-medium text-foreground">Craving Control</h4>
       </div>
-      <p className="text-sm text-muted-foreground mb-3">Tell us what you're craving and we'll suggest a healthier alternative.</p>
+      <p className="text-sm text-muted-foreground mb-3">Tell us what you're craving and we'll explain why, then offer two smart options.</p>
+      <div className="flex flex-wrap gap-2 mb-3">
+        {quickCravings.map(item => (
+          <button
+            key={item}
+            type="button"
+            onClick={() => setInput(item)}
+            className="px-3 py-1.5 rounded-full text-xs bg-secondary text-secondary-foreground hover:bg-primary/10"
+          >
+            {item}
+          </button>
+        ))}
+      </div>
       <div className="flex gap-2">
         <Input
           value={input}
@@ -56,8 +78,29 @@ export default function CravingPanel() {
         </Button>
       </div>
       {response && (
-        <div className="mt-3 p-3 rounded-xl bg-primary/5 border border-primary/10">
-          <p className="text-sm text-foreground">🌿 {response}</p>
+        <div className="mt-3 p-4 rounded-xl bg-primary/5 border border-primary/10 space-y-4">
+          <h5 className="font-heading text-lg font-semibold text-foreground">{formatCravingTitle(response.craving)}</h5>
+
+          <div>
+            <p className="text-sm font-medium text-foreground">Why this craving</p>
+            <ul className="mt-1 list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+              {response.reasons.length > 0 ? (
+                response.reasons.map(reason => <li key={reason}>{reason}</li>)
+              ) : (
+                <li>No major trigger detected from your current health data.</li>
+              )}
+            </ul>
+          </div>
+
+          <div>
+            <p className="text-sm font-medium text-foreground">Option 1 (Activity)</p>
+            <p className="text-sm text-muted-foreground mt-1">{response.activitySuggestion}</p>
+          </div>
+
+          <div>
+            <p className="text-sm font-medium text-foreground">Option 2 (Smart Eating)</p>
+            <p className="text-sm text-muted-foreground mt-1">{response.foodSuggestion}</p>
+          </div>
         </div>
       )}
     </div>

@@ -7,6 +7,7 @@ import InsightsRow from "@/components/dashboard/InsightsRow";
 import ActionRow from "@/components/dashboard/ActionRow";
 import RewardsSection from "@/components/dashboard/RewardsSection";
 import CravingPanel from "@/components/dashboard/CravingPanel";
+import SmartBodyWarningSection from "@/components/dashboard/smart-body/SmartBodyWarningSection";
 import type { useHealthStore } from "@/hooks/useHealthStore";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
@@ -38,7 +39,8 @@ export default function DashboardPage({ store, onLogout }: Props) {
           <InsightsRow insights={store.insights} aiInsight={store.aiInsight} hasData={store.hasData} />
         </section>
         <ActionRow actions={store.actions} hasData={store.hasData} />
-        <CravingPanel />
+        <CravingPanel stats={store.stats} />
+        <SmartBodyWarningSection stats={store.stats} latestLog={store.latestLog} weeklyLogs={store.weeklyLogs} />
         <RewardsSection streak={store.streak} tasks={store.tasks} hasData={store.hasData} badges={store.badges} />
       </main>
     </div>

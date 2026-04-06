@@ -1,4 +1,5 @@
 import { Moon, Footprints, Smile } from "lucide-react";
+import { useMemo, useState } from "react";
 import type { DayLog, UserProfile } from "@/hooks/useHealthStore";
 
 interface Props {
@@ -28,10 +29,13 @@ function scoreForLog(log: DayLog) {
 }
 
 export default function TimelineRow({ weeklyLogs, profile, userMood }: Props) {
+  const [includePastData, setIncludePastData] = useState(false);
+  const todayKey = new Date().toISOString().slice(0, 10);
+
   const baselineLog: DayLog | null = profile ? {
     id: "baseline",
-    date: new Date().toISOString().slice(0, 10),
-    day: "Start",
+    date: todayKey,
+    day: "Today",
     sleepHours: profile.sleepDuration || 0,
     sleepQuality: 3,
     steps: Math.round((profile.walkingDistance || 0) * 1200),
@@ -44,13 +48,39 @@ export default function TimelineRow({ weeklyLogs, profile, userMood }: Props) {
     bloodPressure: "--",
   } : null;
 
-  const ordered = [...(baselineLog ? [baselineLog] : []), ...weeklyLogs].sort((a, b) => a.date.localeCompare(b.date));
+  const hasTodayLog = weeklyLogs.some(log => log.date === todayKey);
+  const todayLog = weeklyLogs.find(log => log.date === todayKey) || null;
+  const pastLogs = weeklyLogs.filter(log => log.date !== todayKey);
+
+  const ordered = useMemo(() => {
+    if (includePastData) {
+      const withFallbackToday = hasTodayLog
+        ? [...weeklyLogs]
+        : [...weeklyLogs, ...(baselineLog ? [baselineLog] : [])];
+      return withFallbackToday.sort((a, b) => a.date.localeCompare(b.date));
+    }
+
+    const todayOnly = todayLog || baselineLog;
+    return todayOnly ? [todayOnly] : [];
+  }, [includePastData, hasTodayLog, weeklyLogs, baselineLog, todayLog]);
+
   const best = ordered.length > 0 ? ordered.reduce((a, b) => scoreForLog(a) > scoreForLog(b) ? a : b) : null;
   const worst = ordered.length > 0 ? ordered.reduce((a, b) => scoreForLog(a) < scoreForLog(b) ? a : b) : null;
 
   return (
     <div className="glass-card p-6 fade-up hover-card">
-      <h3 className="font-heading font-semibold text-foreground mb-1 text-xl">Interactive Timeline</h3>
+      <div className="flex items-start justify-between gap-3 mb-1">
+        <h3 className="font-heading font-semibold text-foreground text-xl">Interactive Timeline</h3>
+        {pastLogs.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setIncludePastData(prev => !prev)}
+            className="text-xs rounded-full border border-border px-3 py-1 text-muted-foreground hover:text-foreground hover:border-primary/60 transition-colors"
+          >
+            {includePastData ? "Today only" : "Include past data"}
+          </button>
+        )}
+      </div>
       {ordered.length > 0 && (
         <div className="flex gap-4 text-xs text-muted-foreground mb-4">
           {best && <span>🏆 Best: <strong className="text-foreground">{best.day}</strong></span>}
