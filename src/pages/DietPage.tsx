@@ -29,7 +29,7 @@ export default function DietPage() {
     <div className="flex-1 min-h-screen">
       <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-30 h-14 flex items-center px-4 gap-2">
         <SidebarTrigger />
-        <h2 className="font-heading font-semibold text-foreground">Diet Recommendations</h2>
+        <h2 className="font-heading font-semibold text-2xl tracking-wide text-gradient">Diet Recommendations</h2>
       </header>
       <main className="p-4 md:p-6 max-w-2xl mx-auto space-y-4">
         <p className="text-sm text-muted-foreground fade-up">Personalized daily diet plan based on your health profile.</p>

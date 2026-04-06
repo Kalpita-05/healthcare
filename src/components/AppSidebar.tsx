@@ -1,8 +1,9 @@
 import {
   LayoutDashboard, CalendarDays, Lightbulb, ListChecks, Utensils, 
-  FlaskConical, MessageCircle, UserCircle
+  FlaskConical, MessageCircle, UserCircle, LogOut
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
+import { Button } from "@/components/ui/button";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
   SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar,
@@ -11,15 +12,19 @@ import {
 const items = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Daily Log", url: "/daily-log", icon: CalendarDays },
-  { title: "Insights", url: "/insights", icon: Lightbulb },
+  { title: "Insights", url: "/dashboard#insights", icon: Lightbulb },
   { title: "Daily Tasks", url: "/tasks", icon: ListChecks },
   { title: "Diet Planner", url: "/diet", icon: Utensils },
   { title: "Simulation", url: "/simulation", icon: FlaskConical },
-  { title: "Chatbot", url: "/chatbot", icon: MessageCircle },
+  { title: "Chatbot", url: "/dashboard#chatbot", icon: MessageCircle },
   { title: "Profile", url: "/profile", icon: UserCircle },
 ];
 
-export default function AppSidebar() {
+interface Props {
+  onLogout: () => void;
+}
+
+export default function AppSidebar({ onLogout }: Props) {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
 
@@ -48,6 +53,17 @@ export default function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        <div className="mt-auto p-3">
+          <Button
+            type="button"
+            onClick={onLogout}
+            variant="outline"
+            className="w-full rounded-xl justify-start gap-2"
+          >
+            <LogOut className="h-4 w-4" />
+            {!collapsed && <span>Logout</span>}
+          </Button>
+        </div>
       </SidebarContent>
     </Sidebar>
   );

@@ -1,11 +1,11 @@
 import { Moon, Footprints, Smile } from "lucide-react";
-import type { DayLog } from "@/hooks/useHealthStore";
+import type { DayLog, UserProfile } from "@/hooks/useHealthStore";
 
 interface Props {
   weeklyLogs: DayLog[];
+  profile: UserProfile | null;
+  userMood: string;
 }
-
-const allDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 const moodEmoji = (mood: number) => {
   if (mood >= 5) return "😊";
@@ -15,69 +15,91 @@ const moodEmoji = (mood: number) => {
   return "😫";
 };
 
-export default function TimelineRow({ weeklyLogs }: Props) {
-  const logMap = new Map(weeklyLogs.map(l => [l.day, l]));
+function timelineMessage(log: DayLog) {
+  if (log.steps >= 10000) return "You walked like a warrior today 👣🔥";
+  if (log.sleepHours < 6) return "Sleep was weak... your bed misses you 😴";
+  if (log.waterIntake >= 2.5) return "Hydration legend mode unlocked 💧";
+  if (log.energyLevel >= 4) return "Energy levels look elite today ⚡";
+  return "Steady progress beats perfect progress 🌿";
+}
 
-  // Find best/worst days based on mood
-  const best = weeklyLogs.length > 0 ? weeklyLogs.reduce((a, b) => a.mood > b.mood ? a : b) : null;
-  const worst = weeklyLogs.length > 0 ? weeklyLogs.reduce((a, b) => a.mood < b.mood ? a : b) : null;
+function scoreForLog(log: DayLog) {
+  return log.steps / 1200 + log.sleepHours * 8 + log.waterIntake * 12 + log.mood * 9 + log.energyLevel * 7;
+}
+
+export default function TimelineRow({ weeklyLogs, profile, userMood }: Props) {
+  const baselineLog: DayLog | null = profile ? {
+    id: "baseline",
+    date: new Date().toISOString().slice(0, 10),
+    day: "Start",
+    sleepHours: profile.sleepDuration || 0,
+    sleepQuality: 3,
+    steps: Math.round((profile.walkingDistance || 0) * 1200),
+    exercise: false,
+    waterIntake: profile.waterIntake || 0,
+    mealsHealthy: false,
+    mood: userMood === "😊" ? 5 : userMood === "🙂" ? 4 : userMood === "😐" ? 3 : userMood === "😴" ? 2 : 1,
+    energyLevel: 3,
+    heartRate: profile.heartRate || 0,
+    bloodPressure: "--",
+  } : null;
+
+  const ordered = [...(baselineLog ? [baselineLog] : []), ...weeklyLogs].sort((a, b) => a.date.localeCompare(b.date));
+  const best = ordered.length > 0 ? ordered.reduce((a, b) => scoreForLog(a) > scoreForLog(b) ? a : b) : null;
+  const worst = ordered.length > 0 ? ordered.reduce((a, b) => scoreForLog(a) < scoreForLog(b) ? a : b) : null;
 
   return (
     <div className="glass-card p-6 fade-up hover-card">
-      <h3 className="font-heading font-semibold text-foreground mb-1">Weekly Timeline</h3>
-      {weeklyLogs.length > 0 && (
+      <h3 className="font-heading font-semibold text-foreground mb-1 text-xl">Interactive Timeline</h3>
+      {ordered.length > 0 && (
         <div className="flex gap-4 text-xs text-muted-foreground mb-4">
           {best && <span>🏆 Best: <strong className="text-foreground">{best.day}</strong></span>}
           {worst && <span>⚠️ Worst: <strong className="text-foreground">{worst.day}</strong></span>}
         </div>
       )}
 
-      {weeklyLogs.length === 0 ? (
+      {ordered.length === 0 ? (
         <div className="text-center py-8">
           <p className="text-muted-foreground text-sm">No data yet</p>
           <p className="text-muted-foreground text-xs mt-1">Log your daily data to see your weekly timeline</p>
         </div>
       ) : (
-        <div className="grid grid-cols-7 gap-2">
-          {allDays.map(day => {
-            const log = logMap.get(day);
-            const isBest = best && best.day === day;
-            const isWorst = worst && worst.day === day && weeklyLogs.length > 1;
-
+        <div className="overflow-x-auto pb-2">
+          <div className="flex items-center min-w-max gap-1 px-2">
+            {ordered.map((log, idx) => {
+              const isBest = best && best.id === log.id;
+              const isWorst = worst && worst.id === log.id && ordered.length > 1;
             return (
-              <div
-                key={day}
-                className={`rounded-2xl p-3 text-center transition-all duration-300 ${
-                  log
-                    ? isBest
-                      ? "bg-health-good/10 ring-2 ring-health-good shadow-md"
-                      : isWorst
-                        ? "bg-destructive/10 ring-2 ring-destructive"
-                        : "bg-muted/50"
-                    : "bg-muted/30 opacity-50"
-                }`}
-              >
-                <p className="text-xs font-semibold text-foreground mb-2">{day}</p>
-                {log ? (
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
-                      <Moon size={10} /> {log.sleep}h
+                <div key={log.id} className="group flex items-center">
+                  <div
+                    className={`relative rounded-full w-16 h-16 border-2 flex items-center justify-center text-lg transition-all duration-300 hover:scale-105 ${
+                      isBest
+                        ? "border-green-500 shadow-[0_0_18px_rgba(34,197,94,0.45)]"
+                        : isWorst
+                          ? "border-red-500"
+                          : "border-border bg-card/70"
+                    }`}
+                  >
+                    {moodEmoji(log.mood)}
+                    <div className="pointer-events-none absolute z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bottom-[72px] left-1/2 -translate-x-1/2 w-64 rounded-xl bg-card/95 border border-border p-3 text-xs shadow-xl">
+                      <p className="font-semibold text-foreground mb-1">{new Date(log.date).toLocaleDateString()} ({log.day})</p>
+                      <p className="text-muted-foreground flex items-center gap-1"><Moon size={10} /> Sleep: {log.sleepHours}h</p>
+                      <p className="text-muted-foreground flex items-center gap-1"><Footprints size={10} /> Steps: {log.steps.toLocaleString()}</p>
+                      <p className="text-muted-foreground flex items-center gap-1"><Smile size={10} /> Mood: {log.mood}/5</p>
+                      <p className="text-foreground mt-2">{timelineMessage(log)}</p>
                     </div>
-                    <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
-                      <Footprints size={10} /> {(log.steps / 1000).toFixed(1)}k
-                    </div>
-                    <p className="text-lg">{moodEmoji(log.mood)}</p>
                   </div>
-                ) : (
-                  <div className="space-y-1.5">
-                    <p className="text-xs text-muted-foreground">—</p>
-                    <p className="text-xs text-muted-foreground">—</p>
-                    <p className="text-lg opacity-30">😶</p>
+                  <div className="text-center mx-2 min-w-16">
+                    <p className="text-xs font-semibold text-foreground">{log.day}</p>
+                    <p className="text-[11px] text-muted-foreground">{log.sleepHours}h · {(log.steps / 1000).toFixed(1)}k</p>
                   </div>
-                )}
-              </div>
-            );
-          })}
+                  {idx < ordered.length - 1 && (
+                    <div className="h-1 w-10 rounded-full bg-gradient-to-r from-primary/50 to-accent/50" />
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>

@@ -8,24 +8,38 @@ import ActionRow from "@/components/dashboard/ActionRow";
 import RewardsSection from "@/components/dashboard/RewardsSection";
 import CravingPanel from "@/components/dashboard/CravingPanel";
 import type { useHealthStore } from "@/hooks/useHealthStore";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 interface Props {
   store: ReturnType<typeof useHealthStore>;
+  onLogout: () => void;
 }
 
-export default function DashboardPage({ store }: Props) {
+export default function DashboardPage({ store, onLogout }: Props) {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash === "#insights") {
+      const el = document.getElementById("insights-section");
+      el?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [location.hash]);
+
   return (
     <div className="flex-1 flex flex-col min-h-screen">
-      <TopNav userName={store.user?.name || "User"} stats={store.stats} />
+      <TopNav userName={store.user?.name || "User"} userEmail={store.user?.email || "No email"} stats={store.stats} notifications={store.notifications} onLogout={onLogout} />
       <main className="flex-1 p-4 md:p-8 space-y-8 max-w-6xl mx-auto w-full">
         <QuickStatsRow stats={store.stats} onUpdateStats={store.setStats} hasData={store.hasData} />
         <HealthStatusRow healthScore={store.healthScore} stats={store.stats} suggestions={store.suggestions} hasData={store.hasData} />
-        <TimelineRow weeklyLogs={store.weeklyLogs} />
+        <TimelineRow weeklyLogs={store.weeklyLogs} profile={store.profile} userMood={store.user?.mood || "😐"} />
         <GraphsRow weeklyLogs={store.weeklyLogs} />
-        <InsightsRow insights={store.insights} aiInsight={store.aiInsight} hasData={store.hasData} />
+        <section id="insights-section">
+          <InsightsRow insights={store.insights} aiInsight={store.aiInsight} hasData={store.hasData} />
+        </section>
         <ActionRow actions={store.actions} hasData={store.hasData} />
         <CravingPanel />
-        <RewardsSection streak={store.streak} tasks={store.tasks} hasData={store.hasData} />
+        <RewardsSection streak={store.streak} tasks={store.tasks} hasData={store.hasData} badges={store.badges} />
       </main>
     </div>
   );

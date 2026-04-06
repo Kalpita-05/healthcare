@@ -1,4 +1,5 @@
 import { Activity, Droplets, Zap } from "lucide-react";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 interface Props {
   healthScore: number;
@@ -9,28 +10,45 @@ interface Props {
 
 export default function HealthStatusRow({ healthScore, stats, suggestions, hasData }: Props) {
   const scoreColor = healthScore >= 70 ? "score-good" : healthScore >= 40 ? "score-warn" : "score-bad";
-  const scoreBg = healthScore >= 70 ? "bg-good" : healthScore >= 40 ? "bg-warn" : "bg-bad";
-
-  const currentSuggestion = suggestions.length > 0
-    ? suggestions[Math.floor(Date.now() / 30000) % suggestions.length]
-    : null;
+  const currentSuggestion = suggestions.length > 0 ? suggestions[0] : null;
+  const chartData = [
+    { name: "score", value: hasData ? healthScore : 0 },
+    { name: "remaining", value: hasData ? 100 - healthScore : 100 },
+  ];
+  const scoreStroke = hasData ? (healthScore >= 70 ? "hsl(var(--health-good))" : healthScore >= 40 ? "hsl(var(--health-warn))" : "hsl(var(--health-bad))") : "hsl(var(--muted-foreground))";
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-      {/* Health Score */}
       <div className="glass-card p-6 flex flex-col items-center justify-center fade-up hover-card">
-        <Activity size={24} className="text-primary mb-2" />
+        <Activity size={24} className="text-primary mb-3" />
         <p className="text-sm text-muted-foreground mb-1">Health Score</p>
-        <p className={`text-5xl font-heading font-bold ${hasData ? scoreColor : "text-muted-foreground"}`}>
-          {hasData ? healthScore : "—"}
-        </p>
-        <div className="w-full mt-3 h-2.5 rounded-full bg-muted overflow-hidden">
-          <div className={`h-full rounded-full ${hasData ? scoreBg : "bg-muted-foreground/20"} transition-all duration-700`} style={{ width: `${hasData ? healthScore : 0}%` }} />
+        <div className="relative w-44 h-44">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={chartData}
+                dataKey="value"
+                startAngle={90}
+                endAngle={-270}
+                innerRadius={55}
+                outerRadius={72}
+                stroke="none"
+                isAnimationActive
+                animationDuration={900}
+              >
+                <Cell fill={scoreStroke} />
+                <Cell fill="hsl(var(--muted) / 0.6)" />
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <p className={`text-4xl font-heading font-bold ${hasData ? scoreColor : "text-muted-foreground"}`}>{hasData ? healthScore : "0"}</p>
+            <p className="text-xs text-muted-foreground">/100</p>
+          </div>
         </div>
         {!hasData && <p className="text-xs text-muted-foreground mt-2">Enter your data to see score</p>}
       </div>
 
-      {/* Today's Summary */}
       <div className="glass-card p-6 fade-up hover-card" style={{ animationDelay: "0.1s" }}>
         <p className="text-sm text-muted-foreground mb-3 flex items-center gap-2"><Droplets size={16} className="text-primary" /> Today's Summary</p>
         <div className="space-y-2.5 text-sm">
@@ -48,7 +66,6 @@ export default function HealthStatusRow({ healthScore, stats, suggestions, hasDa
         </div>
       </div>
 
-      {/* Right Now Decision */}
       <div className="glow-card p-6 fade-up hover-card" style={{ animationDelay: "0.2s" }}>
         <p className="text-sm text-muted-foreground mb-2 flex items-center gap-2"><Zap size={16} className="text-accent" /> Right Now</p>
         {currentSuggestion ? (

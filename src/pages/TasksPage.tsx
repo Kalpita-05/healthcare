@@ -21,7 +21,7 @@ export default function TasksPage({ tasks, toggleTask, addTask, healthScore }: P
     <div className="flex-1 min-h-screen">
       <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-30 h-14 flex items-center px-4 gap-2">
         <SidebarTrigger />
-        <h2 className="font-heading font-semibold text-foreground">Daily Tasks</h2>
+        <h2 className="font-heading font-semibold text-2xl tracking-wide text-gradient">Daily Tasks</h2>
       </header>
       <main className="p-4 md:p-6 max-w-2xl mx-auto space-y-6">
         <div className="glass-card p-6 fade-up">

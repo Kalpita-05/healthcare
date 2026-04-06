@@ -3,6 +3,7 @@ import { MessageCircle, X, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { QuickStats } from "@/hooks/useHealthStore";
+import { useLocation } from "react-router-dom";
 
 interface Message {
   role: "user" | "bot";
@@ -14,7 +15,7 @@ interface Props {
   hasData: boolean;
 }
 
-const quickReplies = ["How is my health?", "Why am I tired?", "What should I eat?"];
+const quickReplies = ["How am I doing today?", "Why am I tired?", "What should I improve first?"];
 
 function getResponse(text: string, stats: QuickStats, hasData: boolean): string {
   const lower = text.toLowerCase();
@@ -69,8 +70,15 @@ export default function ChatbotFloat({ stats, hasData }: Props) {
   const [msgs, setMsgs] = useState<Message[]>([{ role: "bot", text: "Hey! How can I help with your health today? 🌿" }]);
   const [input, setInput] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs]);
+
+  useEffect(() => {
+    if (location.hash === "#chatbot" || location.pathname === "/chatbot") {
+      setOpen(true);
+    }
+  }, [location.hash, location.pathname]);
 
   const send = (text: string) => {
     if (!text.trim()) return;
